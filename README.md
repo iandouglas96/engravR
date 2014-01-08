@@ -35,13 +35,13 @@ This software includes three main sections:
 
   -steppertest.py
   
-    -This functionality can also be obtained with laserengraver -m.
+  -This functionality can also be obtained with laserengraver -m.
     
 -The "client" code, which is a simple GUI to control the engraver remotely:
 
   -remoteengrave.py
   
-    -Requires the pexpect library
+  -Requires the pexpect library
     
 Server Setup
 ============
