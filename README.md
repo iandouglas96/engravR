@@ -97,8 +97,11 @@ password = "your-password-here"
 ```
 
 -Set remdir to whatever directory you want GCode files uploaded to.
+
 -Set the password variable to the password for the "pi" user on the Raspberry Pi.
+
   -You could use a different user, but all instances of "pi@raspberrypi.local" would have to be replaced appropriately for the other user.
+  
 -Install pexpect however you want.  I suggest using:
 
     sudo pip install pexpect
