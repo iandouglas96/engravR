@@ -22,21 +22,32 @@ Overview
 ========
 
 This software includes three main sections:
+
 -The "server" code, to run on the pi.  This consists of the following files:
+
   -laserengraver
+  
   -Bipolar_Stepper_Motor_Class.py
+  
   -Motor_control.py
+  
 -The "test" code, which is a simple mini script that can be used to debugging:
+
   -steppertest.py
+  
     -This functionality can also be obtained with laserengraver -m.
+    
 -The "client" code, which is a simple GUI to control the engraver remotely:
+
   -remoteengrave.py
+  
     -Requires the pexpect library
     
 Server Setup
 ============
 
 -Put the three "server" files on the pi somewhere, probably in the home folder.  For the purposes of this tutorial, I'll assume that files are in a folder called engravR in the /home/pi directory.
+
 -Run following commands:
 
     cd engravR
@@ -62,6 +73,7 @@ Laser_switch=3;
     export PATH=/home/pi/engravR:$PATH
     
 -Save and exit nano.
+
 -Now, try running:
 
     sudo -i laserengraver -h
@@ -88,6 +100,7 @@ Client Setup
 ============
 
 -Put the remoteengrave.py file somewhere on the client machine.
+
 -Open remoteengrave.py with your favorite text editor.  Look at the folowing lines:
 
 ```
