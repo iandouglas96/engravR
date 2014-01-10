@@ -33,6 +33,7 @@ parser = argparse.ArgumentParser(description="RPi Controlled Laser Engraver")
 group = parser.add_mutually_exclusive_group(required=True)
 group.add_argument("-f", "--filepath", help="Path to GCode file")
 group.add_argument("-m", "--manual", action="store_true", help="Manually control printer")
+parser.add_argument("-s", "--speed", type=float, help="Engraving speed (mm/sec)")
 args = parser.parse_args()
 
 GPIO.setmode(GPIO.BOARD)
@@ -46,7 +47,10 @@ Laser_switch=3;
 dx=0.075; #resolution in x direction. Unit: mm
 dy=0.075; #resolution in y direction. Unit: mm
 
-Engraving_speed=0.1; #unit=mm/sec=0.04in/sec
+if (args.speed > 0):
+	Engraving_speed=args.speed; #unit=mm/sec=0.04in/sec
+else:
+	Engraving_speed=0.1; #unit=mm/sec=0.04in/sec
 
 #######B#########################################################################################
 ################################################################################################
@@ -61,6 +65,8 @@ GPIO.setup(Laser_switch,GPIO.OUT);
 GPIO.output(Laser_switch,False);
 
 speed=Engraving_speed/min(dx,dy);      #step/sec
+
+engraving = False
 
 ################################################################################################
 ################################################################################################
@@ -112,11 +118,18 @@ def moveto(MX,x_pos,dx,MY,y_pos,dy,speed,engraving):
     if Total_step>0:
         if engraving == False: #fast movement
             print 'No Laser, fast movement: Dx=', stepx, '  Dy=', stepy;
-            Motor_control.Motor_Step(MX,stepx,MY,stepy,50);
+            Motor_control.Motor_Step(MX,stepx,MY,stepy,100);
         else:
             print 'Laser on, movement: Dx=', stepx, '  Dy=', stepy;
             Motor_control.Motor_Step(MX,stepx,MY,stepy,speed);
     return 0;
+    
+def laseron(): #When laser is turned on for the first time, pause a bit
+	global engraving
+	if (engraving == False):
+		engraving = True
+		GPIO.output(Laser_switch,True);
+		time.sleep(1)
 
 ###########################################################################################
 ###########################################################################################
@@ -148,7 +161,7 @@ try:#read and execute G code
                 print 'Laser turned off';
                 
             elif lines[0:3]=='M03':
-                GPIO.output(Laser_switch,True);
+                laseron()
                 print 'Laser turned on';
 
             elif lines[0:3]=='M02':
@@ -164,15 +177,14 @@ try:#read and execute G code
                         GPIO.output(Laser_switch,False);
                         engraving=False;
                     else:
-                        GPIO.output(Laser_switch,True);
-                        engraving=True;
+                        laseron()
                     
                     [x_pos,y_pos]=XYposition(lines);
                     moveto(MX,x_pos,dx,MY,y_pos,dy,speed,engraving);
                 
             elif (lines[0:3]=='G02')|(lines[0:3]=='G03'): #circular interpolation
                 if (lines.find('X') != -1 and lines.find('Y') != -1 and lines.find('I') != -1 and lines.find('J') != -1):
-                    GPIO.output(Laser_switch,True);
+                    laseron()
                     old_x_pos=x_pos;
                     old_y_pos=y_pos;
 

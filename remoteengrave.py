@@ -21,12 +21,9 @@ ssh_newkey = "Are you sure you want to continue connecting"
 
 #User set variables
 remdir = "/home/pi/engravingfiles/"
+address = "raspberrypi.local" #This will be an IP address if avahi-daemon is not installed (which I strongly reccommend
+user = "pi"
 password = "your-password-here"
-#NOTE:
-#'pi@raspberrypi.local used for ip address
-#Assuming default account
-#This requires avahi-daemon
-#See http://elinux.org/RPi_Advanced_Setup#Setting_up_for_remote_access_.2F_headless_operation
 
 #Also, laserengraver must be in the $PATH variable on the pi
 
@@ -62,31 +59,42 @@ def sshcmd(cmd): #Automates sending of ssh commands to pi.
 def engrave():
 	global filepath
 	global filename
-	if filepath.endswith(".ngc"):#File of correct type?
-		proceed = tkMessageBox.askokcancel(title="Are You Sure?", message="Make sure that the engraver is positioned correctly, power is applied, and the laser safety is off before continuing")
-	else:
+	
+	proceed = True
+	speed = 0.5
+	
+	try:
+		speed = float(speedfield.get())
+	except ValueError:
 		proceed = False
-		tkMessageBox.showerror(title="Error", message="Selected file not of correct type.  Must have extension '.ngc'.")
+		tkMessageBox.showerror(title="Error", message="'Engrave Speed' field must be filled with a number.")
+	
+	if (proceed == True):
+		if filepath.endswith(".ngc"):#File of correct type?
+			proceed = tkMessageBox.askokcancel(title="Are You Sure?", message="Make sure that the engraver is positioned correctly, power is applied, and the laser safety is off before continuing")
+		else:
+			proceed = False
+			tkMessageBox.showerror(title="Error", message="Selected file not of correct type.  Must have extension '.ngc'.")
 	
 	if proceed:
 		#Copy file to pi
-		sshcmd("scp "+filepath+" pi@raspberrypi.local:"+remdir)
+		sshcmd("scp "+filepath+" "+user+"@"+address+":"+remdir)
 		
 		#Initiate Engraving
 		#nohup required, or will fail when this program closed
-		sshcmd("ssh pi@raspberrypi.local 'sudo -i nohup laserengraver -f "+remdir+filename+" > foo.txt &'")
+		sshcmd("ssh "+user+"@"+address+" 'sudo -i nohup laserengraver -f "+remdir+filename+" -s "+str(speed)+" > foo.txt &'")
 
 def cancel():
 	proceed = tkMessageBox.askokcancel(title="Are You Sure?", message="Engraving cannot be resumed after cancellation.")
 	
 	if proceed:
-		sshcmd("ssh pi@raspberrypi.local 'sudo killall python'")
+		sshcmd("ssh "+user+"@"+address+" 'sudo killall python'")
 		
 def shutdown():
 	proceed = tkMessageBox.askokcancel(title="Are You Sure?", message="Engraving will stop, and cannot be resumed.")
 	
 	if proceed:
-		sshcmd("ssh pi@raspberrypi.local 'sudo shutdown -h now'")
+		sshcmd("ssh "+user+"@"+address+" 'sudo shutdown -h now'")
 
 root = Tkinter.Tk()
 root.wm_title("RemotEngravR")
@@ -100,6 +108,15 @@ browsebutton=Tkinter.Button(root,text='Browse', command=getpath)
 browsebutton.pack()
 engravebutton=Tkinter.Button(root,text='Engrave', command=engrave)
 engravebutton.pack()
+
+speedframe=Tkinter.Frame(root)
+speedframe.pack()
+speedlabel=Tkinter.Label(speedframe, text='Engrave Speed (mm/sec):')
+speedlabel.pack(side=Tkinter.LEFT)
+speedfield=Tkinter.Entry(speedframe, width=5)
+speedfield.insert(Tkinter.END, "0.5")
+speedfield.pack(side=Tkinter.RIGHT)
+
 cancelbutton=Tkinter.Button(root,text='Cancel Engraving', command=cancel)
 cancelbutton.pack()
 shutdownbutton=Tkinter.Button(root,text='Shutdown', command=shutdown)

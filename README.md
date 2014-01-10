@@ -81,7 +81,7 @@ Laser_switch=3;
 -The following should display:
 
 ```
-usage: laserengraver [-h] (-f FILEPATH | -m)
+usage: laserengraver [-h] (-f FILEPATH | -m) [-s SPEED]
 
 RPi Controlled Laser Engraver
 
@@ -90,6 +90,8 @@ optional arguments:
   -f FILEPATH, --filepath FILEPATH
                         Path to GCode file
   -m, --manual          Manually control printer
+  -s SPEED, --speed SPEED
+                        Engraving speed (mm/sec)
 ```
 
 Now, the terminal interface is ready to go.  If you are comfortable with using the cli via ssh to control the pi, you can probably stop here.  If you would like a client GUI, proceed
@@ -106,14 +108,16 @@ Client Setup
 ```
 #User set variables
 remdir = "/home/pi/engravingfiles/"
+address = "raspberrypi.local"
+user = "pi"
 password = "your-password-here"
 ```
 
 -Set remdir to whatever directory you want GCode files uploaded to.
 
--Set the password variable to the password for the "pi" user on the Raspberry Pi.
+-Address is the IP address of the pi (raspberrypi.local with avahi-daemon installed)
 
-  -You could use a different user, but all instances of "pi@raspberrypi.local" would have to be replaced appropriately for the other user.
+-User and password are both fairly self-explanatory
   
 -Install pexpect however you want.  I suggest using:
 
