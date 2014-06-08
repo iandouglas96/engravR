@@ -6,6 +6,8 @@ Powered by Python 2.7
 
 See www.youtube.com/watch?v=xxQ33cNIXxU for a tutorial/intro video.
 
+See http://makezine.com/projects/engravr-a-pi-powered-laser-engraver/ for a more in depth tutorial and more information.
+
 This software allows for the control of a laser engraver with a Raspberry Pi.  Details on the construction of such a machine can be found here: http://funofdiy.blogspot.com/2013/10/a-raspberry-pi-controlled-mini-laser.html
 
 This code is based off of the code found there by Xiang Zhai.
