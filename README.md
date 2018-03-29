@@ -108,7 +108,7 @@ Client Setup
 -Open remoteengrave.py with your favorite text editor.  Look at the folowing lines:
 
 ```
-#User set variables
+# User set variables
 remdir = "/home/pi/engravingfiles/"
 address = "raspberrypi.local"
 user = "pi"
